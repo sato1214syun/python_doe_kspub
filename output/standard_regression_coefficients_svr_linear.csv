@@ -1,6 +1,6 @@
-"",standard_regression_coefficients
-raw material 1,-0.35467681320138306
-raw material 2,-0.08417141701715158
-raw material 3,0.38077145706289073
-temperature,0.006076196758954919
-time,-0.04153442310985507
+standard_regression_coefficients,variable
+-0.3813498196795143,raw material 1
+-0.1891202966293451,raw material 2
+0.43829155744153875,raw material 3
+0.0010303140755728302,temperature
+-0.01787162816317324,time
