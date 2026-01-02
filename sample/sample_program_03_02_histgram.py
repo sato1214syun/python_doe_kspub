@@ -9,10 +9,11 @@ import matplotlib.pyplot as plt  # matplotlib の pyplot の読み込み。一�
 number_of_variable = 0  # ヒストグラムを描画する特徴量の番号。Python では 0 から順番が始まるため注意しましょう
 number_of_bins = 10  # ビンの数
 
-dataset = pd.read_csv('resin.csv', index_col=0, header=0)  # データセットの読み込み
+dataset = pd.read_csv("test_data/resin.csv", index_col=0, header=0)  # データセットの読み込み
 
-plt.rcParams['font.size'] = 18  # 横軸や縦軸の名前の文字などのフォントのサイズ
+plt.rcParams["font.size"] = 18  # 横軸や縦軸の名前の文字などのフォントのサイズ
 plt.hist(dataset.iloc[:, number_of_variable], bins=number_of_bins)  # ヒストグラムの作成
 plt.xlabel(dataset.columns[number_of_variable])  # 横軸の名前
-plt.ylabel('frequency')  # 縦軸の名前
+plt.ylabel("frequency")  # 縦軸の名前
+plt.savefig("sample/output/03_02/histogram.png")  # ヒストグラムを画像ファイルとして保存
 plt.show()  # 以上の設定において、グラフを描画

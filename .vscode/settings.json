@@ -1,5 +1,21 @@
 {
     "cSpell.words": [
-        "ocsvm"
+        "coefs",
+        "ddof",
+        "Hiromasa",
+        "histplot",
+        "importances",
+        "Kaneko",
+        "kneighbors",
+        "linalg",
+        "newaxis",
+        "ocsvm",
+        "rdkit",
+        "submodel",
+        "submodels",
+        "xlabel",
+        "xlim",
+        "ylabel",
+        "ylim"
     ]
 }

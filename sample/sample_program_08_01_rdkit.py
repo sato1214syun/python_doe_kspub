@@ -5,4 +5,4 @@
 
 from rdkit import rdBase
 
-print('RDKit version: {0}'.format(rdBase.rdkitVersion))
+print("RDKit version: {0}".format(rdBase.rdkitVersion))
