@@ -94,6 +94,7 @@ plt.xlim(y_min - 0.05 * (y_max - y_min), y_max + 0.05 * (y_max - y_min))
 plt.xlabel("actual y")  # x 軸の名前
 plt.ylabel("estimated y")  # y 軸の名前
 plt.gca().set_aspect("equal", adjustable="box")  # 図の形を正方形に
+plt.savefig("sample/output/03_08/actual_vs_estimated_y_train_dt.png")
 plt.show()  # 以上の設定で描画
 
 # トレーニングデータのr2, RMSE, MAE

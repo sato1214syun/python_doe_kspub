@@ -45,9 +45,11 @@ for x_variables_rate in x_variables_rates:
         n_estimators=number_of_trees,
         max_features=int(math.ceil(x_train.shape[1] * x_variables_rate)),
         oob_score=True,
+        random_state=59,
     )
     model.fit(x_train, y_train)
     r2_oob.append(r2_score(y_train, model.oob_prediction_))
+
 # 結果の確認
 plt.rcParams["font.size"] = 18
 plt.scatter(x_variables_rates, r2_oob, c="blue")
@@ -55,21 +57,21 @@ plt.xlabel("rate of x-variables")
 plt.ylabel("r2 in OOB")
 plt.savefig("sample/output/03_09/r2oob_vs_rate_of_x_variables_rf.png")
 plt.show()
-  # r2oob_allが最も大きい X の割合
-optimal_x_variables_rate = x_variables_rates[
-    np.where(r2_oob == np.max(r2_oob))[0][0]
-]
+# r2oob_allが最も大きい X の割合
+optimal_x_variables_rate = x_variables_rates[np.where(r2_oob == np.max(r2_oob))[0][0]]
 print(
     "最適化された決定木ごとの X の数 :",
     int(math.ceil(x_train.shape[1] * optimal_x_variables_rate)),
 )
 
 # モデル構築
+# RF モデルの宣言
 model = RandomForestRegressor(
     n_estimators=number_of_trees,
     max_features=int(math.ceil(x_train.shape[1] * optimal_x_variables_rate)),
     oob_score=True,
-)  # RF モデルの宣言
+    random_state=59,
+)
 model.fit(x_train, y_train)  # モデル構築
 
 # 特徴量の重要度

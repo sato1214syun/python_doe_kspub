@@ -1,0 +1,21 @@
+,standard_regression_coefficients
+raw material 1,-0.2408153556379976
+raw material 2,-0.11486561399307892
+raw material 3,0.2790945443562151
+temperature,0.0377916754608455
+time,-0.0995842046348568
+raw material 1^2,-0.17015681249882164
+raw material 2^2,0.1854273679575615
+raw material 3^2,0.41178537451993685
+temperature^2,-0.1695383696675618
+time^2,-0.10422596561493505
+raw material 1*raw material 2,-0.10884985590449658
+raw material 1*raw material 3,-0.2450916581391973
+raw material 1*temperature,0.020183558765169574
+raw material 1*time,-0.04138425438080777
+raw material 2*raw material 3,-0.24909563052647132
+raw material 2*temperature,0.010383392472047788
+raw material 2*time,-0.026925648160083346
+raw material 3*temperature,-0.00021414167997102496
+raw material 3*time,-0.08115248389403594
+temperature*time,0.33570995718463076
