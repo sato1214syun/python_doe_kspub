@@ -295,7 +295,7 @@ if (
     )
     # csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
     standard_regression_coefficients.to_csv(
-        "sample/output/05_03/standard_regression_coefficients_{0}_ori.csv".format(
+        "sample/output/05_03/standard_regression_coefficients_{0}.csv".format(
             regression_method
         )
     )
@@ -341,7 +341,7 @@ y_error_train.columns = ["error_of_y(actual_y-estimated_y)"]
 results_train = pd.concat([y_for_save, estimated_y, y_error_train], axis=1)  # 結合
 # 推定値を csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
 results_train.to_csv(
-    "sample/output/05_03/estimated_y_in_detail_{0}_ori.csv".format(regression_method)
+    "sample/output/05_03/estimated_y_in_detail_{0}.csv".format(regression_method)
 )
 
 # クロスバリデーションによる y の値の推定
@@ -394,7 +394,7 @@ y_error_in_cv.columns = ["error_of_y(actual_y-estimated_y)"]
 results_in_cv = pd.concat([y_for_save, estimated_y_in_cv, y_error_in_cv], axis=1)
 # 推定値を csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
 results_in_cv.to_csv(
-    "sample/output/05_03/estimated_y_in_cv_in_detail_{0}_ori.csv".format(
+    "sample/output/05_03/estimated_y_in_cv_in_detail_{0}.csv".format(
         regression_method
     )
 )
@@ -424,7 +424,7 @@ estimated_y_prediction = pd.DataFrame(
 )
 # 予測結果を csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
 estimated_y_prediction.to_csv(
-    "sample/output/05_03/estimated_y_prediction_{0}_ori.csv".format(regression_method)
+    "sample/output/05_03/estimated_y_prediction_{0}.csv".format(regression_method)
 )
 # 非線形変換を戻す
 if regression_method == "ols_nonlinear":
@@ -456,7 +456,7 @@ if ad_method == "knn":
     )
     # csv ファイルに保存。同じ名前のファイルがあるときは上書きされるため注意
     mean_of_knn_distance_train.to_csv(
-        "sample/output/05_03/mean_of_knn_distance_train_ori.csv"
+        "sample/output/05_03/mean_of_knn_distance_train.csv"
     )
 
     # トレーニングデータのサンプルの rate_of_training_samples_inside_ad * 100 % が含まれるようにしきい値を設定
@@ -532,7 +532,7 @@ elif ad_method == "ocsvm":
         data_density_train, index=x.index, columns=["ocsvm_data_density"]
     )
     # csv ファイルに保存。同じ名前のファイルがあるときは上書きされるため注意
-    data_density_train.to_csv("sample/output/05_03/ocsvm_data_density_train_ori.csv")
+    data_density_train.to_csv("sample/output/05_03/ocsvm_data_density_train.csv")
     # トレーニングデータに対して、AD の中か外かを判定
     inside_ad_flag_train = data_density_train >= 0
     # 予測用データのデータ密度 (f(x) の値)
@@ -550,7 +550,7 @@ elif ad_method == "ocsvm":
     )
     # csv ファイルに保存。同じ名前のファイルがあるときは上書きされるため注意
     ad_index_prediction.to_csv(
-        "sample/output/05_03/ocsvm_ad_index_prediction_ori_ori.csv"
+        "sample/output/05_03/ocsvm_ad_index_prediction.csv"
     )
     # 予測用トデータに対して、AD の中か外かを判定
     inside_ad_flag_prediction = ad_index_prediction >= 0
@@ -561,7 +561,7 @@ estimated_y_prediction[np.logical_not(inside_ad_flag_prediction)] = -(10**10)
 inside_ad_flag_train.columns = ["inside_ad_flag"]
 # csv ファイルに保存。同じ名前のファイルがあるときは上書きされるため注意
 inside_ad_flag_train.to_csv(
-    "sample/output/05_03/inside_ad_flag_train_{0}_ori.csv".format(ad_method)
+    "sample/output/05_03/inside_ad_flag_train_{0}.csv".format(ad_method)
 )
 inside_ad_flag_prediction.columns = ["inside_ad_flag"]
 # csv ファイルに保存。同じ名前のファイルがあるときは上書きされるため注意
@@ -570,11 +570,11 @@ inside_ad_flag_prediction.to_csv(
 )
 # csv ファイルに保存。同じ名前のファイルがあるときは上書きされるため注意
 ad_index_prediction.to_csv(
-    "sample/output/05_03/ad_index_prediction_{0}_ori.csv".format(ad_method)
+    "sample/output/05_03/ad_index_prediction_{0}.csv".format(ad_method)
 )
 # csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
 estimated_y_prediction.to_csv(
-    "sample/output/05_03/estimated_y_prediction_considering_ad_{0}_{1}_ori.csv".format(
+    "sample/output/05_03/estimated_y_prediction_considering_ad_{0}_{1}.csv".format(
         regression_method, ad_method
     )
 )
@@ -583,7 +583,7 @@ estimated_y_prediction.to_csv(
 next_sample = x_prediction.loc[estimated_y_prediction.idxmax()]  # 次のサンプル
 # csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
 next_sample.to_csv(
-    "sample/output/05_03/next_sample_{0}_{1}_ori.csv".format(
+    "sample/output/05_03/next_sample_{0}_{1}.csv".format(
         regression_method, ad_method
     )
 )

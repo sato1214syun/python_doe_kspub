@@ -1,5 +1,6 @@
 import math
 from pathlib import Path
+from typing import overload
 
 import numpy as np
 import polars as pl
@@ -26,7 +27,7 @@ from sklearn.model_selection import (
 
 
 # カーネル 11 種類
-def generate_kernels(x: np.ndarray) -> list[Sum]:
+def generate_kernels(x: np.ndarray | pl.DataFrame) -> list[Sum]:
     return [
         ConstantKernel() * DotProduct() + WhiteKernel(),
         ConstantKernel() * RBF() + WhiteKernel(),
@@ -50,13 +51,21 @@ def generate_kernels(x: np.ndarray) -> list[Sum]:
     ]
 
 
+@overload
 def load_data(
-    file_path: Path | str, index: int | str | None = None
-) -> tuple[pl.DataFrame, pl.Series]:
+    file_path: Path | str, index: int | str
+) -> tuple[pl.DataFrame, pl.Series]: ...
+
+
+@overload
+def load_data(file_path: Path | str, index: None = None) -> pl.DataFrame: ...
+
+
+def load_data(file_path, index=None):
     """Load data from a CSV file."""
     dataset = pl.read_csv(file_path)
     if index is None:
-        return dataset, None
+        return dataset
     if isinstance(index, int):
         index = dataset.columns[index]
     y = dataset.get_column(index)
@@ -86,7 +95,17 @@ def delete_zero_std_columns(data: pl.DataFrame) -> pl.DataFrame:
     return data_wo_zero_std
 
 
-def autoscaling[T, V](data: T, data2: V = None) -> T:
+@overload
+def autoscaling(
+    data: pl.DataFrame, data2: pl.DataFrame | None = None
+) -> pl.DataFrame: ...
+
+
+@overload
+def autoscaling(data: pl.Series, data2: pl.Series | None = None) -> pl.Series: ...
+
+
+def autoscaling(data, data2=None):
     if data2 is None:
         if isinstance(data, pl.Series):
             return (data - data.mean()) / data.std()
@@ -105,7 +124,19 @@ def autoscaling[T, V](data: T, data2: V = None) -> T:
         raise TypeError("Input must be a Polars Series or DataFrame.")
 
 
-def rescaling[T, V](autoscaled_data: T, original_data: V, is_std: bool = False) -> T:
+@overload
+def rescaling(
+    autoscaled_data: pl.DataFrame, original_data: pl.DataFrame, is_std: bool = False
+) -> pl.DataFrame: ...
+
+
+@overload
+def rescaling(
+    autoscaled_data: pl.Series, original_data: pl.Series, is_std: bool = False
+) -> pl.Series: ...
+
+
+def rescaling(autoscaled_data, original_data, is_std=False):
     if isinstance(autoscaled_data, pl.Series) and isinstance(original_data, pl.Series):
         if is_std:
             return autoscaled_data * original_data.std()
@@ -126,8 +157,12 @@ def rescaling[T, V](autoscaled_data: T, original_data: V, is_std: bool = False) 
         raise TypeError("Input must be a Polars Series or DataFrame.")
 
 
-def scatter_plot_of_result[T: pl.DataFrame | pl.Series](
-    save_path: Path | str, x: T, y: T, x_label: str = "x", y_label: str = "y"
+def scatter_plot_of_result(
+    save_path: Path | str,
+    x: pl.DataFrame,
+    y: pl.Series,
+    x_label: str = "x",
+    y_label: str = "y",
 ) -> None:
     """実測値 vs. 推定値の散布図を作成して保存する関数"""
     # 実測値 vs. 推定値のプロット
@@ -161,9 +196,9 @@ def show_fitting_evaluation(true_val, estimated_val) -> None:
 
 
 def calc_r2(
+    model,
     x: pl.DataFrame,
     y: pl.Series,
-    model,
     cv: KFold = None,
     y_true: pl.Series = None,
     **model_kwargs,
@@ -177,6 +212,7 @@ def calc_r2(
                 ),
             )
         return r2_score(y, model(**model_kwargs).fit(x, y).predict(x))
+
     if y_true is not None:
         return r2_score(
             y_true,
@@ -224,7 +260,7 @@ def optimize_hyperparameters_by_cv(
     optimal_nonlinear_gamma = calc_optimal_gamma(x, gammas)
 
     # CV による ε の最適化
-    calc_r2_params = {"x": x, "y": y, "model": model, "cv": cv, "y_true": y_true}
+    calc_r2_params = {"model": model, "x": x, "y": y, "cv": cv, "y_true": y_true}
     # ε の最適化
     r2_cvs = pl.Series(
         "epsilons_r2",
@@ -302,3 +338,17 @@ def optimize_hyperparameters_by_gs(
     for param_name, value in gs.best_params_.items():
         print(f"Best parameter log({param_name}): {math.log2(value)}")
     return gs.best_params_
+
+
+def add_sqrt_and_interaction_terms(df: pl.DataFrame) -> pl.DataFrame:
+    """説明変数の二乗項や交差項を追加"""
+    from itertools import combinations
+
+    return df.with_columns(  # 二乗項の追加
+        [(pl.col(col) ** 2).alias(f"{col}^2") for col in df.columns]
+    ).with_columns(  # 交差項の追加
+        [
+            (pl.col(col1) * pl.col(col2)).alias(f"{col1}*{col2}")
+            for col1, col2 in combinations(df.columns, 2)
+        ]
+    )
