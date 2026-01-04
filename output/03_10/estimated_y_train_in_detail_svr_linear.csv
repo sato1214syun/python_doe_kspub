@@ -1,4 +1,4 @@
-column_0,actual_y,estimated_y,error_of_y(actual_y-estimated_y)
+,actual_y,estimated_y,error_of_y(actual_y-estimated_y)
 sample_7,0.771,0.577916779362745,0.19308322063725503
 sample_11,0.066,0.10106758687872111,-0.03506758687872111
 sample_17,0.511,0.4838978416578902,0.027102158342109828

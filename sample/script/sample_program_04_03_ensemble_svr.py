@@ -45,6 +45,7 @@ for submodel_number in range(number_of_sub_datasets):
     print(submodel_number + 1, "/", number_of_sub_datasets)  # 進捗状況の表示
     # 説明変数の選択
     # 0 から 1 までの間に一様に分布する乱数を説明変数の数だけ生成して、その乱数値が小さい順に説明変数を選択
+    np.random.seed(submodel_number)
     random_x_variables = np.random.rand(x.shape[1])
     selected_x_variable_numbers_tmp = random_x_variables.argsort()[
         :number_of_x_variables

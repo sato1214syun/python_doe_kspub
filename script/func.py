@@ -1,3 +1,4 @@
+import math
 from pathlib import Path
 
 import numpy as np
@@ -9,8 +10,8 @@ from sklearn.gaussian_process.kernels import (
     ConstantKernel,
     DotProduct,
     Matern,
-    WhiteKernel,
     Sum,
+    WhiteKernel,
 )
 from sklearn.metrics import (
     mean_absolute_error,
@@ -18,11 +19,10 @@ from sklearn.metrics import (
     root_mean_squared_error,
 )
 from sklearn.model_selection import (
+    GridSearchCV,
     KFold,
     cross_val_predict,
-    GridSearchCV,
 )
-import math
 
 
 # カーネル 11 種類
@@ -51,15 +51,15 @@ def generate_kernels(x: np.ndarray) -> list[Sum]:
 
 
 def load_data(
-    file_path: Path | str, y_col: int | str | None = None
+    file_path: Path | str, index: int | str | None = None
 ) -> tuple[pl.DataFrame, pl.Series]:
     """Load data from a CSV file."""
     dataset = pl.read_csv(file_path)
-    if y_col is None:
+    if index is None:
         return dataset, None
-    if isinstance(y_col, int):
-        y_col = dataset.columns[y_col]
-    y = dataset.get_column(y_col)
+    if isinstance(index, int):
+        index = dataset.columns[index]
+    y = dataset.get_column(index)
     x = dataset.drop(y.name)
     return x, y
 
@@ -105,7 +105,7 @@ def autoscaling[T, V](data: T, data2: V = None) -> T:
         raise TypeError("Input must be a Polars Series or DataFrame.")
 
 
-def rescaling[T, V](autoscaled_data: T, original_data: V, is_std: bool=False) -> T:
+def rescaling[T, V](autoscaled_data: T, original_data: V, is_std: bool = False) -> T:
     if isinstance(autoscaled_data, pl.Series) and isinstance(original_data, pl.Series):
         if is_std:
             return autoscaled_data * original_data.std()
@@ -217,6 +217,7 @@ def optimize_hyperparameters_by_cv(
     epsilons: pl.Series,
     gammas: pl.Series,
     cv: KFold,
+    verbose: bool = True,
 ) -> tuple[float, float, float]:
     # ハイパーパラメータC, ε, γの最適化
     # グラム行列の分散が最大となるγを探索
@@ -271,15 +272,16 @@ def optimize_hyperparameters_by_cv(
     )
     optimal_nonlinear_gamma: float = gammas.item(r2_cvs.arg_max())
     # 結果の確認
-    print(
-        f"最適化された C : {optimal_nonlinear_c} (log(C)={math.log2(optimal_nonlinear_c)})"
-    )
-    print(
-        f"最適化された ε : {optimal_nonlinear_epsilon} (log(ε)={math.log2(optimal_nonlinear_epsilon)})"
-    )
-    print(
-        f"最適化された γ : {optimal_nonlinear_gamma} (log(γ)={math.log2(optimal_nonlinear_gamma)})"
-    )
+    if verbose:
+        print(
+            f"最適化された C : {optimal_nonlinear_c} (log(C)={math.log2(optimal_nonlinear_c)})"
+        )
+        print(
+            f"最適化された ε : {optimal_nonlinear_epsilon} (log(ε)={math.log2(optimal_nonlinear_epsilon)})"
+        )
+        print(
+            f"最適化された γ : {optimal_nonlinear_gamma} (log(γ)={math.log2(optimal_nonlinear_gamma)})"
+        )
     return (
         optimal_nonlinear_c,
         optimal_nonlinear_epsilon,
