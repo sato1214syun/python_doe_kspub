@@ -24,6 +24,8 @@ from sklearn.model_selection import (
     KFold,
     cross_val_predict,
 )
+from sklearn.neighbors import NearestNeighbors
+from sklearn.svm import OneClassSVM
 
 
 # カーネル 11 種類
@@ -352,3 +354,53 @@ def add_sqrt_and_interaction_terms(df: pl.DataFrame) -> pl.DataFrame:
             for col1, col2 in combinations(df.columns, 2)
         ]
     )
+
+
+def calc_ad_by_knn(
+    x: pl.DataFrame,
+    n_neighbors: int,
+    ad_threshold: float = 0.96,
+    remove_self: bool = True,
+) -> tuple[pl.Series, pl.Series, float]:
+    ad_model = NearestNeighbors(n_neighbors=n_neighbors, metric="euclidean")
+    ad_model.fit(x)
+
+    if remove_self:
+        # 1(自分自身) + n_neighbors個のサンプルを抽出
+        knn_distance_wt_self, _ = ad_model.kneighbors(x, n_neighbors=1 + n_neighbors)
+        # 自分自身との距離を削除
+        knn_distance = pl.DataFrame(knn_distance_wt_self).drop(pl.first())
+
+    # 距離の平均を取得
+    mean_of_knn_distance = knn_distance.mean_horizontal().rename("mean_of_knn_distance")
+    # 各距離にたいしAD の中/外を判定
+    ad_threshold = mean_of_knn_distance.quantile(ad_threshold, "lower")
+    within_ad_flag = mean_of_knn_distance.le(ad_threshold)
+
+    return mean_of_knn_distance, within_ad_flag, ad_threshold
+
+
+def calc_ad_by_ocsvm(
+    ad_model: OneClassSVM,
+    x: pl.DataFrame,
+    train_data: bool = True,
+) -> tuple[pl.Series, pl.Series]:
+    # トレーニングデータのデータ密度 (f(x) の値)を取得し、ADの中/外を判定(0以上:AD内、0未満:AD外)
+    data_density = pl.Series(ad_model.decision_function(x))
+    within_ad_flag = data_density.ge(0)
+
+    number_of_outliers = data_density.lt(0).sum()
+    if train_data:
+        print(
+            f"\nトレーニングデータにおけるサポートベクター数 :{ad_model.support_.size}"
+            f"\nトレーニングデータにおけるサポートベクターの割合 :{ad_model.support_.size / x.height}"
+            f"\nトレーニングデータにおける外れサンプル数 :{number_of_outliers}"
+            f"\nトレーニングデータにおける外れサンプルの割合 :{number_of_outliers / x.height}"
+        )
+    else:
+        print(
+            f"\n予測用データセットにおける外れサンプル数 :{number_of_outliers}",
+            f"\n予測用データセットにおける外れサンプルの割合 :{number_of_outliers / x.height}",
+        )
+
+    return data_density, within_ad_flag
