@@ -4,6 +4,7 @@
 """
 
 import pandas as pd
+import polars as pl
 import numpy as np
 
 number_of_selecting_samples = 30  # 選択するサンプル数
@@ -11,7 +12,9 @@ number_of_random_searches = (
     1000  # ランダムにサンプルを選択して D 最適基準を計算する繰り返し回数
 )
 
-x_generated = pd.read_csv("sample/output/05_01/generated_samples.csv", index_col=0, header=0)
+x_generated = pd.read_csv(
+    "sample/output/05_01/generated_samples.csv", index_col=0, header=0
+)
 autoscaled_x_generated = (x_generated - x_generated.mean()) / x_generated.std()
 
 # 実験条件の候補のインデックスの作成
@@ -19,11 +22,26 @@ all_indexes = list(range(x_generated.shape[0]))
 
 # D 最適基準に基づくサンプル選択
 np.random.seed(11)  # 乱数を生成するためのシードを固定
+seed = 11
+# rng = np.random.default_rng(seed)
+# pl.set_random_seed(seed)
 for random_search_number in range(number_of_random_searches):
     # 1. ランダムに候補を選択
-    new_selected_indexes = np.random.choice(
-        all_indexes, number_of_selecting_samples, replace=False
+    new_selected_indexes = (
+        pl.from_pandas(autoscaled_x_generated.reset_index())
+        .sample(
+            n=number_of_selecting_samples,
+            with_replacement=False,
+            shuffle=False,
+            seed=seed,
+        )
+        .get_column("index")
+        .to_numpy()
     )
+    # 1. ランダムに候補を選択
+    # new_selected_indexes = np.random.choice(
+    #     all_indexes, number_of_selecting_samples, replace=False
+    # )
     new_selected_samples = autoscaled_x_generated.iloc[new_selected_indexes, :]
     # 2. D 最適基準を計算
     xt_x = np.dot(new_selected_samples.T, new_selected_samples)

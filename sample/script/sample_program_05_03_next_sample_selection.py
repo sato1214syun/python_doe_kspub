@@ -252,7 +252,7 @@ elif regression_method == "svr_gaussian":
     )
 elif regression_method == "gpr_one_kernel":
     selected_kernel = kernels[kernel_number]
-    model = GaussianProcessRegressor(alpha=0, kernel=selected_kernel)
+    model = GaussianProcessRegressor(alpha=0, kernel=selected_kernel, random_state=99)
 elif regression_method == "gpr_kernels":
     # クロスバリデーションによるカーネル関数の最適化
     # クロスバリデーションの分割の設定
@@ -274,7 +274,7 @@ elif regression_method == "gpr_kernels":
     print("クロスバリデーションで選択されたカーネル関数 :", optimal_kernel)
 
     # モデル構築
-    model = GaussianProcessRegressor(alpha=0, kernel=optimal_kernel)  # GPR モデルの宣言
+    model = GaussianProcessRegressor(alpha=0, kernel=optimal_kernel, random_state=99)  # GPR モデルの宣言
 
 model.fit(autoscaled_x, autoscaled_y)  # モデル構築
 
@@ -325,6 +325,7 @@ plt.xlim(y_min - 0.05 * (y_max - y_min), y_max + 0.05 * (y_max - y_min))
 plt.xlabel("actual y")  # x 軸の名前
 plt.ylabel("estimated y")  # y 軸の名前
 plt.gca().set_aspect("equal", adjustable="box")  # 図の形を正方形に
+plt.savefig(f"sample/output/05_03/actual_vs_estimated_y_train_{regression_method}.png")  # 画像ファイルに保存
 plt.show()  # 以上の設定で描画
 
 # トレーニングデータのr2, RMSE, MAE
@@ -378,7 +379,7 @@ plt.xlim(y_min - 0.05 * (y_max - y_min), y_max + 0.05 * (y_max - y_min))
 plt.xlabel("actual y")  # x 軸の名前
 plt.ylabel("estimated y")  # y 軸の名前
 plt.gca().set_aspect("equal", adjustable="box")  # 図の形を正方形に
-plt.savefig("estimated_y_in_cv_{0}.png".format(regression_method))  # 画像ファイルに保存
+plt.savefig(f"sample/output/05_03/actual_vs_estimated_y_in_cv_{regression_method}.png")  # 画像ファイルに保存
 plt.show()  # 以上の設定で描画
 
 # クロスバリデーションにおけるr2, RMSE, MAE
