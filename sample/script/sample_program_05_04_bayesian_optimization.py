@@ -3,21 +3,22 @@
 @author: Hiromasa Kaneko
 """
 
+import warnings
+
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
+import pandas as pd
 from scipy.stats import norm
-from sklearn.model_selection import KFold, cross_val_predict
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import (
-    WhiteKernel,
     RBF,
     ConstantKernel,
-    Matern,
     DotProduct,
+    Matern,
+    WhiteKernel,
 )
-from sklearn.metrics import r2_score, root_mean_squared_error, mean_absolute_error
-import warnings
+from sklearn.metrics import mean_absolute_error, r2_score, root_mean_squared_error
+from sklearn.model_selection import KFold, cross_val_predict
 
 warnings.filterwarnings("ignore")
 
@@ -31,7 +32,9 @@ relaxation = 0.01  # EI, PI
 delta = 10**-6  # MI
 
 dataset = pd.read_csv("test_data/resin.csv", index_col=0, header=0)
-x_prediction = pd.read_csv("sample/output/05_02/remaining_samples.csv", index_col=0, header=0)
+x_prediction = pd.read_csv(
+    "sample/output/05_02/remaining_samples.csv", index_col=0, header=0
+)
 
 # データ分割
 y = dataset.iloc[:, 0]  # 目的変数
@@ -67,7 +70,7 @@ autoscaled_x_prediction = (x_prediction - x.mean()) / x.std()
 # モデル構築
 if regression_method == "gpr_one_kernel":
     selected_kernel = kernels[kernel_number]
-    model = GaussianProcessRegressor(alpha=0, kernel=selected_kernel)
+    model = GaussianProcessRegressor(alpha=0, kernel=selected_kernel, random_state=99)
 elif regression_method == "gpr_kernels":
     # クロスバリデーションによるカーネル関数の最適化
     # クロスバリデーションの分割の設定
@@ -88,8 +91,8 @@ elif regression_method == "gpr_kernels":
     print("クロスバリデーションで選択されたカーネル関数の番号 :", optimal_kernel_number)
     print("クロスバリデーションで選択されたカーネル関数 :", optimal_kernel)
 
-    # モデル構築
-    model = GaussianProcessRegressor(alpha=0, kernel=optimal_kernel)  # GPR モデルの宣言
+    # モデル構築 GPR モデルの宣言
+    model = GaussianProcessRegressor(alpha=0, kernel=optimal_kernel, random_state=99)
 
 model.fit(autoscaled_x, autoscaled_y)  # モデル構築
 

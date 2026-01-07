@@ -1,11 +1,12 @@
 import math
 from pathlib import Path
-from typing import overload
+from typing import Literal, overload
 
 import numpy as np
 import polars as pl
 import seaborn as sns
 from matplotlib import pyplot as plt
+from scipy.stats import norm
 from sklearn.gaussian_process.kernels import (
     RBF,
     ConstantKernel,
@@ -404,3 +405,41 @@ def calc_ad_by_ocsvm(
         )
 
     return data_density, within_ad_flag
+
+
+def calc_acquisition_func(
+    y: pl.Series,
+    y_std: pl.Series,
+    func: Literal["MI", "EI", "PI", "PTR"],
+    target_range: tuple[float, float],
+    relaxation: float,
+    delta: float,
+) -> pl.Series:
+    # 比較用(temp)
+
+    # MI で必要な "ばらつき" を 0 で初期化
+    cumulative_variance = pl.zeros(y.len(), eager=True)
+
+    if func == "MI":
+        ac_func_pred = y + np.log(2 / delta) ** 0.5 * (
+            (y**2 + cumulative_variance) ** 0.5 - cumulative_variance**0.5
+        )
+        cumulative_variance = cumulative_variance + y_std**2
+    elif func == "EI":
+        ac_func_pred = (y - max(y) - relaxation * y.std()) * norm.cdf(
+            (y - max(y) - relaxation * y.std()) / y_std
+        ) + y_std * norm.pdf((y - max(y) - relaxation * y.std()) / y_std)
+    elif func == "PI":
+        ac_func_pred = norm.cdf((y - max(y) - relaxation * y.std()) / y_std)
+    elif func == "PTR":
+        ac_func_pred = norm.cdf(target_range[1], loc=y, scale=y_std) - norm.cdf(
+            target_range[0], loc=y, scale=y_std
+        )
+
+    ac_func_pred[y_std <= 0] = 0
+    ac_func_pred = (
+        pl.Series(ac_func_pred)
+        if not isinstance(ac_func_pred, pl.Series)
+        else ac_func_pred
+    )
+    return ac_func_pred, cumulative_variance
