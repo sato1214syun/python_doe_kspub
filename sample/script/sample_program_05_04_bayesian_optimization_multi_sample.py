@@ -77,7 +77,7 @@ for sample_number in range(number_of_selecting_samples):
     # モデル構築
     if regression_method == "gpr_one_kernel":
         selected_kernel = kernels[kernel_number]
-        model = GaussianProcessRegressor(alpha=0, kernel=selected_kernel)
+        model = GaussianProcessRegressor(alpha=0, kernel=selected_kernel ,random_state=99)
     elif regression_method == "gpr_kernels":
         # クロスバリデーションによるカーネル関数の最適化
         # クロスバリデーションの分割の設定
@@ -85,7 +85,7 @@ for sample_number in range(number_of_selecting_samples):
         r2cvs = []  # 空の list。カーネル関数ごとに、クロスバリデーション後の r2 を入れていきます
         for index, kernel in enumerate(kernels):
             print(index + 1, "/", len(kernels))
-            model = GaussianProcessRegressor(alpha=0, kernel=kernel)
+            model = GaussianProcessRegressor(alpha=0, kernel=kernel, random_state=99)
             estimated_y_in_cv = np.ndarray.flatten(
                 cross_val_predict(
                     model, autoscaled_x, autoscaled_y, cv=cross_validation
@@ -105,7 +105,7 @@ for sample_number in range(number_of_selecting_samples):
 
         # モデル構築
         # GPR モデルの宣言
-        model = GaussianProcessRegressor(alpha=0, kernel=optimal_kernel)
+        model = GaussianProcessRegressor(alpha=0, kernel=optimal_kernel, random_state=99)
 
     model.fit(autoscaled_x, autoscaled_y)  # モデル構築
 
@@ -144,7 +144,7 @@ for sample_number in range(number_of_selecting_samples):
         plt.ylabel("estimated y")  # y 軸の名前
         plt.gca().set_aspect("equal", adjustable="box")  # 図の形を正方形に
         plt.savefig(
-            "sample/output/05_04/actual_vs_estimated_y_{0}.png".format(
+            "sample/output/05_04/multi_sample_actual_vs_estimated_y_{0}.png".format(
                 regression_method
             )
         )
@@ -167,7 +167,7 @@ for sample_number in range(number_of_selecting_samples):
         )
         # 推定値を csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
         results_train.to_csv(
-            "sample/output/05_04/estimated_y_in_detail_{0}.csv".format(
+            "sample/output/05_04/multi_sample_estimated_y_in_detail_{0}.csv".format(
                 regression_method
             )
         )
@@ -207,7 +207,7 @@ for sample_number in range(number_of_selecting_samples):
         plt.ylabel("estimated y")  # y 軸の名前
         plt.gca().set_aspect("equal", adjustable="box")  # 図の形を正方形に
         plt.savefig(
-            "sample/output/05_04/actual_vs_estimated_y_in_cv_{0}.png".format(
+            "sample/output/05_04/multi_sample_actual_vs_estimated_y_in_cv_{0}.png".format(
                 regression_method
             )
         )
@@ -230,7 +230,7 @@ for sample_number in range(number_of_selecting_samples):
         )
         # 推定値を csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
         results_in_cv.to_csv(
-            "sample/output/05_04/estimated_y_in_cv_in_detail_{0}.csv".format(
+            "sample/output/05_04/multi_sample_estimated_y_in_cv_in_detail_{0}.csv".format(
                 regression_method
             )
         )
@@ -293,19 +293,19 @@ for sample_number in range(number_of_selecting_samples):
     if sample_number == 0:
         # 予測結果を csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
         estimated_y_prediction.to_csv(
-            "sample/output/05_04/estimated_y_prediction_{0}.csv".format(
+            "sample/output/05_04/multi_sample_estimated_y_prediction_{0}.csv".format(
                 regression_method
             )
         )
         # 予測値の標準偏差を csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
         estimated_y_prediction_std.to_csv(
-            "sample/output/05_04/estimated_y_prediction_{0}_std.csv".format(
+            "sample/output/05_04/multi_sample_estimated_y_prediction_{0}_std.csv".format(
                 regression_method
             )
         )
         # 獲得関数を csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
         acquisition_function_prediction.to_csv(
-            "sample/output/05_04/acquisition_function_prediction_{0}_{1}.csv".format(
+            "sample/output/05_04/multi_sample_acquisition_function_prediction_{0}_{1}.csv".format(
                 regression_method, acquisition_function
             )
         )
@@ -345,7 +345,7 @@ for sample_number in range(number_of_selecting_samples):
 
 # csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
 next_samples.to_csv(
-    "sample/output/05_04/next_samples_bo_{0}_{1}.csv".format(
+    "sample/output/05_04/multi_sample_next_samples_bo_{0}_{1}.csv".format(
         regression_method, acquisition_function
     )
 )
