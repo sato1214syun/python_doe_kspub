@@ -414,7 +414,7 @@ def calc_acquisition_func(
     target_range: tuple[float, float],
     relaxation: float,
     delta: float,
-) -> pl.Series:
+) -> tuple[pl.Series, pl.Series]:
     # 比較用(temp)
 
     # MI で必要な "ばらつき" を 0 で初期化

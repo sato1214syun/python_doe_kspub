@@ -77,7 +77,9 @@ for sample_number in range(number_of_selecting_samples):
     # モデル構築
     if regression_method == "gpr_one_kernel":
         selected_kernel = kernels[kernel_number]
-        model = GaussianProcessRegressor(alpha=0, kernel=selected_kernel ,random_state=99)
+        model = GaussianProcessRegressor(
+            alpha=0, kernel=selected_kernel, random_state=99
+        )
     elif regression_method == "gpr_kernels":
         # クロスバリデーションによるカーネル関数の最適化
         # クロスバリデーションの分割の設定
@@ -105,7 +107,9 @@ for sample_number in range(number_of_selecting_samples):
 
         # モデル構築
         # GPR モデルの宣言
-        model = GaussianProcessRegressor(alpha=0, kernel=optimal_kernel, random_state=99)
+        model = GaussianProcessRegressor(
+            alpha=0, kernel=optimal_kernel, random_state=99
+        )
 
     model.fit(autoscaled_x, autoscaled_y)  # モデル構築
 
