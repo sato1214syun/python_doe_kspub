@@ -7,7 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "matplotlib>=3.10.5",
     "pandas>=2.3.1",
-    "polars[rtcompat]>=1.35.2",
+    "polars[rtcompat]>=1.37.0",
     "rdkit>=2025.9.3",
     "scikit-learn>=1.7.1",
     "seaborn>=0.13.2",
@@ -18,5 +18,5 @@ dependencies = [
 dev = [
     "jupyter>=1.1.1",
     "pyarrow>=21.0.0",
-    "ruff>=0.14.8",
+    "ruff>=0.14.11",
 ]

@@ -96,7 +96,7 @@ for y_number in range(number_of_y_variables):
     # モデル構築
     if regression_method == "gpr_one_kernel":
         selected_kernel = kernels[kernel_number]
-        model = GaussianProcessRegressor(alpha=0, kernel=selected_kernel)
+        model = GaussianProcessRegressor(alpha=0, kernel=selected_kernel, random_state=99)
     elif regression_method == "gpr_kernels":
         # クロスバリデーションによるカーネル関数の最適化
         # クロスバリデーションの分割の設定
@@ -104,7 +104,7 @@ for y_number in range(number_of_y_variables):
         r2cvs = []  # 空の list。カーネル関数ごとに、クロスバリデーション後の r2 を入れていきます
         for index, kernel in enumerate(kernels):
             print(index + 1, "/", len(kernels))
-            model = GaussianProcessRegressor(alpha=0, kernel=kernel)
+            model = GaussianProcessRegressor(alpha=0, kernel=kernel, random_state=99)
             estimated_y_in_cv = np.ndarray.flatten(
                 cross_val_predict(
                     model,
@@ -129,7 +129,7 @@ for y_number in range(number_of_y_variables):
 
         # モデル構築
         # GPR モデルの宣言
-        model = GaussianProcessRegressor(alpha=0, kernel=optimal_kernel)
+        model = GaussianProcessRegressor(alpha=0, kernel=optimal_kernel, random_state=99)
 
     model.fit(autoscaled_x, autoscaled_y.iloc[:, y_number])  # モデル構築
 
@@ -171,7 +171,7 @@ for y_number in range(number_of_y_variables):
     plt.ylabel("estimated {0}".format(y.columns[y_number]))  # y 軸の名前
     plt.gca().set_aspect("equal", adjustable="box")  # 図の形を正方形に
     plt.savefig(
-        "sample/output/05_04/actual_vs_estimated_multi_y_{0}_{1}.png".format(
+        "sample/output/05_04/05_04_02/actual_vs_estimated_multi_y_{0}_{1}.png".format(
             regression_method, y_number
         )
     )
@@ -199,7 +199,7 @@ for y_number in range(number_of_y_variables):
     )
     # 推定値を csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
     results_train.to_csv(
-        "sample/output/05_04/estimated_y_in_detail_multi_y_{0}_{1}.csv".format(
+        "sample/output/05_04/05_04_02/estimated_y_in_detail_multi_y_{0}_{1}.csv".format(
             regression_method, y_number
         )
     )
@@ -241,7 +241,7 @@ for y_number in range(number_of_y_variables):
     plt.ylabel("estimated {0}".format(y.columns[y_number]))  # y 軸の名前
     plt.gca().set_aspect("equal", adjustable="box")  # 図の形を正方形に
     plt.savefig(
-        "sample/output/05_04/actual_vs_estimated_in_cv_multi_y_{0}_{1}.png".format(
+        "sample/output/05_04/05_04_02/actual_vs_estimated_in_cv_multi_y_{0}_{1}.png".format(
             regression_method, y_number
         )
     )
@@ -266,7 +266,7 @@ for y_number in range(number_of_y_variables):
     results_in_cv = pd.concat([y_for_save, estimated_y_in_cv, y_error_in_cv], axis=1)
     # 推定値を csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
     results_in_cv.to_csv(
-        "sample/output/05_04/estimated_y_in_cv_in_detail_multi_y_{0}_{1}.csv".format(
+        "sample/output/05_04/05_04_02/estimated_y_in_cv_in_detail_multi_y_{0}_{1}.csv".format(
             regression_method, y_number
         )
     )
@@ -323,7 +323,7 @@ estimated_y_prediction_all = pd.DataFrame(
 )
 # 予測結果を csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
 estimated_y_prediction_all.to_csv(
-    "sample/output/05_04/estimated_y_prediction_multi_y_{0}.csv".format(
+    "sample/output/05_04/05_04_02/estimated_y_prediction_multi_y_{0}.csv".format(
         regression_method
     )
 )
@@ -332,7 +332,7 @@ std_of_estimated_y_prediction_all = pd.DataFrame(
 )
 # 予測値の標準偏差を csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
 std_of_estimated_y_prediction_all.to_csv(
-    "sample/output/05_04/estimated_y_prediction_multi_y_std_{0}.csv".format(
+    "sample/output/05_04/05_04_02/estimated_y_prediction_multi_y_std_{0}.csv".format(
         regression_method
     )
 )
@@ -341,7 +341,7 @@ probabilities_prediction_all = pd.DataFrame(
 )
 # 獲得関数 (目標達成確率) を csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
 probabilities_prediction_all.to_csv(
-    "sample/output/05_04/probabilities_prediction_multi_y_{0}.csv".format(
+    "sample/output/05_04/05_04_02/probabilities_prediction_multi_y_{0}.csv".format(
         regression_method
     )
 )
@@ -351,7 +351,7 @@ sum_of_log_probabilities = pd.DataFrame(
     columns=["sum_of_log_probabilities"],
 )
 sum_of_log_probabilities.to_csv(
-    "sample/output/05_04/sum_of_log_probabilities_prediction_multi_y_{0}.csv".format(
+    "sample/output/05_04/05_04_02/sum_of_log_probabilities_prediction_multi_y_{0}.csv".format(
         regression_method
     )
 )
@@ -360,5 +360,5 @@ sum_of_log_probabilities.to_csv(
 next_sample = x_prediction.loc[sum_of_log_probabilities.idxmax()]  # 次のサンプル
 # csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
 next_sample.to_csv(
-    "sample/output/05_04/next_sample_bo_multi_y_{0}.csv".format(regression_method)
+    "sample/output/05_04/05_04_02/next_sample_bo_multi_y_{0}.csv".format(regression_method)
 )
