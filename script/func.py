@@ -190,12 +190,9 @@ def scatter_plot_of_result(
 def show_fitting_evaluation(true_val, estimated_val) -> None:
     """回帰モデルの適合度を評価する関数"""
     # トレーニングデータのr2, RMSE, MAE
-    print("r^2 for training data :", r2_score(true_val, estimated_val))
-    print(
-        "RMSE for training data :",
-        root_mean_squared_error(true_val, estimated_val),
-    )
-    print("MAE for training data :", mean_absolute_error(true_val, estimated_val))
+    print("r^2:", r2_score(true_val, estimated_val))
+    print("RMSE:", root_mean_squared_error(true_val, estimated_val))
+    print("MAE:", mean_absolute_error(true_val, estimated_val))
 
 
 def calc_r2(
