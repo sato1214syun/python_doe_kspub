@@ -49,11 +49,9 @@ bond_list = [
 ]
 
 generated_structures = []
+rng = np.random.default_rng(99)
 for generated_structure_number in range(number_of_generating_structures):
-    selected_main_molecule_number = np.floor(
-        np.random.rand(1) * len(main_molecules)
-    ).astype(int)[0]
-    main_molecule = main_molecules[selected_main_molecule_number]
+    main_molecule = rng.choice(main_molecules)  # ランダムに主骨格を選択
     # make adjacency matrix and get atoms for main molecule
     main_adjacency_matrix = Chem.rdmolops.GetAdjacencyMatrix(main_molecule)
     for bond in main_molecule.GetBonds():
@@ -104,16 +102,14 @@ for generated_structure_number in range(number_of_generating_structures):
         main_atoms.remove("*")
     main_size = main_adjacency_matrix.shape[0]
 
-    selected_fragment_numbers = np.floor(
-        np.random.rand(len(r_index_in_main_molecule_old)) * len(fragment_molecules)
-    ).astype(int)
+    selected_fragment_molecules = rng.choice(
+        fragment_molecules, len(r_index_in_main_molecule_old)
+    )
 
     generated_molecule_atoms = main_atoms[:]
     generated_adjacency_matrix = main_adjacency_matrix.copy()
     for r_number_in_molecule in range(len(r_index_in_main_molecule_new)):
-        fragment_molecule = fragment_molecules[
-            selected_fragment_numbers[r_number_in_molecule]
-        ]
+        fragment_molecule = selected_fragment_molecules[r_number_in_molecule]
         fragment_adjacency_matrix = Chem.rdmolops.GetAdjacencyMatrix(fragment_molecule)
         for bond in fragment_molecule.GetBonds():
             fragment_adjacency_matrix[bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()] = (
@@ -202,7 +198,7 @@ for generated_structure_number in range(number_of_generating_structures):
         generated_structure_number + 1
     ) == number_of_generating_structures:
         print(generated_structure_number + 1, "/", number_of_generating_structures)
-generated_structures = list(set(generated_structures))  # 重複する構造の削除
+generated_structures = sorted(list(set(generated_structures)))  # 重複する構造の削除
 generated_structures = pd.DataFrame(generated_structures, columns=["SMILES"])
 # csv ファイルに保存。同じ名前のファイルがあるときは上書きされますので注意してください
 generated_structures.to_csv("sample/output/05_05/generated_structures_r_group.csv")
