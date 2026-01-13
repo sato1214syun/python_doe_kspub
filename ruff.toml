@@ -1,0 +1,17 @@
+builtins = ["_"]
+fix = true
+src = ["src", "tests"]
+target-version = "py312"
+
+[lint]
+select = ["ALL"]
+ignore = ["T201", "COM812"]
+
+[lint.pydocstyle]
+convention = "numpy"
+
+[lint.per-file-ignores]
+"**/tests/**/*.py" = ["S101", "ARG", "FBT", "PLR2004", "S311"]
+
+[format]
+docstring-code-format = true
